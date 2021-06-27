@@ -29,17 +29,32 @@ namespace ft {
 				return (*this);
 			}
 
-			ListNode*	getPrev(void) const
+			ListNode*	getPrev(void)
 			{
 				return (this->_prev);
 			}
 
-			ListNode*	getNext(void) const
+			const ListNode*	getPrev(void) const
+			{
+				return (this->_prev);
+			}
+
+			ListNode*	getNext(void)
 			{
 				return (this->_next);
 			}
 
+			const ListNode*	getNext(void) const
+			{
+				return (this->_next);
+			}
+			
 			_T&	getData(void)
+			{
+				return (this->_data);
+			}
+
+			const _T&	getData(void) const
 			{
 				return (this->_data);
 			}

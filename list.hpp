@@ -4,6 +4,7 @@
 # include <iostream>
 # include "ListNode.hpp"
 # include "ListIterator.hpp"
+# include "utils.hpp"
 
 namespace ft {
 	template < typename _T, typename _Alloc = std::allocator< _T > >
@@ -16,9 +17,9 @@ namespace ft {
 			typedef value_type*	pointer;
 			typedef const value_type*	const_pointer;
 			typedef ListIterator< value_type >	iterator;
-			// const_iterator
-			// reverse_iterator
-			// const_reverse_iterator
+			typedef ListConstIterator< value_type > const_iterator;
+			typedef ListReverseIterator< value_type > reverse_iterator;
+			typedef ListConstReverseIterator< value_type > const_reverse_iterator;
 			typedef typename ft::iterator_traits< iterator >::difference_type	difference_type;
 			typedef	std::size_t	size_type;
 
@@ -71,7 +72,7 @@ namespace ft {
 				this->_head = this->_createNode(0, 0, value_type());
 			}
 
-			explicit list (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : _alloc(alloc), _size(0)
+			explicit list (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : _size(0), _alloc(alloc)
 			{
 				this->_head = this->_createNode(0, 0, value_type());
 				for (size_type i = 0; i < n; i++)
@@ -79,14 +80,14 @@ namespace ft {
 			}
 
 			template <typename InputIterator>
-			list (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()) : _alloc(alloc), _size(0)
+			list (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(), typename ft::enable_if < !ft::is_integral < InputIterator >::value >::type* = NULL) : _size(0), _alloc(alloc)
 			{
 				this->_head = this->_createNode(0, 0, value_type());
 				for (InputIterator iter = first; iter != last; ++iter)
 					this->push_back(*iter);
 			}
 
-			list (const list& x) : _alloc(x._alloc), _size(0)
+			list (const list& x) : _size(0), _alloc(x._alloc)
 			{
 				this->_head = this->_createNode(0, 0, value_type());
 				*this = x;
@@ -113,40 +114,40 @@ namespace ft {
 				return (iterator(this->_head->getNext()));
 			}
 
-			// const_iterator	begin(void) const
-			// {
-
-			// }
+			const_iterator	begin(void) const
+			{
+				return (const_iterator(this->_head->getNext()));
+			}
 
 			iterator	end(void)
 			{
 				return (iterator(this->_head));
 			}
 
-			// const_iterator	end(void) const
-			// {
+			const_iterator	end(void) const
+			{
+				return (const_iterator(this->_head));
+			}
 
-			// }
+			reverse_iterator rbegin(void)
+			{
+				return (reverse_iterator(this->_head->getPrev()));
+			}
 
-			// reverse_iterator rbegin(void)
-			// {
+			const_reverse_iterator	rbegin(void) const
+			{
+				return (const_reverse_iterator(this->_head->getPrev()));
+			}
 
-			// }
+			reverse_iterator	rend(void)
+			{
+				return (reverse_iterator(this->_head));
+			}
 
-			// const_reverse_iterator	rbegin(void) const
-			// {
-
-			// }
-
-			// reverse_iterator	rend(void)
-			// {
-
-			// }
-
-			// const_reverse_iterator	rend(void) const
-			// {
-
-			// }
+			const_reverse_iterator	rend(void) const
+			{
+				return (const_reverse_iterator(this->_head));
+			}
 
 			bool	empty(void) const
 			{
@@ -168,23 +169,23 @@ namespace ft {
 				return (this->_head->getNext()->getData());
 			}
 
-			// const_reference	front(void) const
-			// {
-
-			// }
+			const_reference	front(void) const
+			{
+				return (this->_head->getNext()->getData());
+			}
 
 			reference	back(void)
 			{
 				return (this->_head->getPrev()->getData());
 			}
 
-			// const_reference	back(void) const
-			// {
-
-			// }
+			const_reference	back(void) const
+			{
+				return (this->_head->getPrev()->getData());
+			}
 
 			template <class InputIterator>
-			void	assign(InputIterator first, InputIterator last)
+			void	assign(InputIterator first, InputIterator last, typename ft::enable_if< !ft::is_integral< InputIterator >::value, InputIterator >::type* = NULL )
 			{
 				this->clear();
 				for (InputIterator iter = first; iter != last; ++iter)
@@ -248,7 +249,7 @@ namespace ft {
 					return (this->end());
 				}
 				node_pointer	prevNode = position.getPtr()->getPrev();
-				node_pointer	newNode = this->_createNode(position.getPtr()->getPrev, position.getPtr(), val);
+				node_pointer	newNode = this->_createNode(position.getPtr()->getPrev(), position.getPtr(), val);
 
 				position.getPtr()->setPrev(newNode);
 				prevNode->setNext(newNode);
@@ -263,7 +264,7 @@ namespace ft {
 			}
 
 			template <class InputIterator>
-			void	insert(iterator position, InputIterator first, InputIterator last)
+			void	insert(iterator position, InputIterator first, InputIterator last, typename ft::enable_if < !ft::is_integral < InputIterator >::value, InputIterator >::type* = NULL )
 			{
 				for (InputIterator iter = first; iter != last; iter++)
 				{
@@ -276,7 +277,7 @@ namespace ft {
 				iterator	curIter = position++;
 
 				curIter.getPtr()->getPrev()->setNext(position.getPtr());
-				position.getPtr()->setPrev(curIter.getPtr()->setPrev());
+				position.getPtr()->setPrev(curIter.getPtr()->getPrev());
 				this->_deleteNode(curIter.getPtr());
 				--this->_size;
 				return (position);
@@ -373,11 +374,11 @@ namespace ft {
 
 			void	unique(void)
 			{
-				for (iterator iter = this->begin(); iter.getPtr()->getNext() != this->end(); ++iter)
+				for (iterator iter = this->begin(); iter.getPtr()->getNext() != this->end().getPtr(); ++iter)
 				{
 					while (1)
 					{
-						if (iter.getPtr()->getNext() != this->end() && iter.getPtr()->getData() == iter.getPtr()->getNext()->getData())
+						if (iter.getPtr()->getNext() != this->end().getPtr() && iter.getPtr()->getData() == iter.getPtr()->getNext()->getData())
 						{
 							node_pointer	deleteNode = iter.getPtr()->getNext();
 
@@ -393,13 +394,13 @@ namespace ft {
 			}
 
 			template <typename BinaryPredicate>
-			void	unique(BinaryPredicate)
+			void	unique(BinaryPredicate comp)
 			{
-				for (iterator iter = this->begin(); iter.getPtr()->getNext() != this->end(); ++iter)
+				for (iterator iter = this->begin(); iter.getPtr()->getNext() != this->end().getPtr(); ++iter)
 				{
 					while (1)
 					{
-						if (iter.getPtr()->getNext() != this->end() && BinaryPredicate(iter.getPtr()->getData(), iter.getPtr()->getNext()->getData()))
+						if (iter.getPtr()->getNext() != this->end().getPtr() && comp(iter.getPtr()->getData(), iter.getPtr()->getNext()->getData()))
 						{
 							node_pointer	deleteNode = iter.getPtr()->getNext();
 
@@ -418,7 +419,7 @@ namespace ft {
 			{
 				for (iterator thisIter = this->begin(), xIter = x.begin(); thisIter != this->end() && xIter != x.end();)
 				{
-					if (*xIter < thisIter)
+					if (*xIter < *thisIter)
 						this->splice(thisIter, x, xIter++);
 					else
 						thisIter++;
@@ -431,7 +432,7 @@ namespace ft {
 			{
 				for (iterator thisIter = this->begin(), xIter = x.begin(); thisIter != this->end() && xIter != x.end();)
 				{
-					if (cmp(*xIter, thisIter))
+					if (comp(*xIter, *thisIter))
 						this->splice(thisIter, x, xIter++);
 					else
 						thisIter++;
@@ -481,7 +482,7 @@ namespace ft {
 	{
 		if (lhs.size() != rhs.size())
 			return (false);
-		for (typename list< _T >::iterator lIter = lhs.begin(), rIter = rhs.begin(); lIter != lhs.end();)
+		for (typename list< _T >::const_iterator lIter = lhs.begin(), rIter = rhs.begin(); lIter != lhs.end();)
 		{
 			if (*(lIter++) != *(rIter++))
 				return (false);
@@ -489,20 +490,20 @@ namespace ft {
 		return (true);
 	}
 
-	template < typename _T, typename _Alloc >
-	bool	operator!= (const list< _T, _Alloc >& lhs, const list< _T, _Alloc >& rhs)
+	template < typename _T >
+	bool	operator!= (const list< _T >& lhs, const list< _T >& rhs)
 	{
 		return (!(lhs == rhs));
 	}
 
-	template < typename _T, typename _Alloc >
-	bool	operator< (const list< _T, _Alloc >& lhs, const list< _T, _Alloc >& rhs)
+	template < typename _T >
+	bool	operator< (const list< _T >& lhs, const list< _T >& rhs)
 	{
 		if (lhs.size() < rhs.size())
 			return (true);
 		if (lhs.size() > rhs.size())
 			return (false);
-		for (typename list< _T >::iterator lIter = lhs.begin(), rIter = rhs.begin(); lIter != lhs.end(); ++lIter, ++rIter)
+		for (typename list< _T >::const_iterator lIter = lhs.begin(), rIter = rhs.begin(); lIter != lhs.end(); ++lIter, ++rIter)
 		{
 			if (*lIter != *rIter)
 				return (*lIter < *rIter);
@@ -510,20 +511,20 @@ namespace ft {
 		return (false);
 	}
 
-	template < typename _T, typename _Alloc >
-	bool	operator<= (const list< _T, _Alloc >& lhs, const list< _T, _Alloc >& rhs)
+	template < typename _T >
+	bool	operator<= (const list< _T >& lhs, const list< _T >& rhs)
 	{
 		return (!(rhs < lhs));
 	}
 
-	template < typename _T, typename _Alloc >
-	bool	operator> (const list< _T, _Alloc >& lhs, const list< _T, _Alloc >& rhs)
+	template < typename _T >
+	bool	operator> (const list< _T >& lhs, const list< _T >& rhs)
 	{
 		return (rhs < lhs);
 	}
 
-	template < typename _T, typename _Alloc >
-	bool	operator>= (const list< _T, _Alloc >& lhs, const list< _T, _Alloc >& rhs)
+	template < typename _T >
+	bool	operator>= (const list< _T >& lhs, const list< _T >& rhs)
 	{
 		return (!(lhs < rhs));
 	}
