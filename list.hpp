@@ -38,7 +38,6 @@ namespace ft {
 			{
 				node_pointer	newNode = this->_alloc.allocate(1);
 				this->_alloc.construct(newNode, node_type(prev, next, value));
-
 				return (newNode);
 			}
 
@@ -50,16 +49,12 @@ namespace ft {
 
 			void	_swapNextNode(node_pointer node)
 			{
-				if (node->getNext() == 0)
-					return ;
 				node_pointer	prevNode = node->getPrev();
 				node_pointer	nextNode = node->getNext();
 				node_pointer	nextTwiceNode = nextNode->getNext();
 
-				if (prevNode != 0)
-					prevNode->setNext(nextNode);
-				if (nextTwiceNode != 0)
-					nextTwiceNode->setPrev(node);
+				prevNode->setNext(nextNode);
+				nextTwiceNode->setPrev(node);
 				node->setPrev(nextNode);
 				node->setNext(nextTwiceNode);
 				nextNode->setPrev(prevNode);
@@ -69,12 +64,16 @@ namespace ft {
 		public:
 			explicit list (const allocator_type& alloc = allocator_type()) : _head(0), _size(0), _alloc(alloc)
 			{
-				this->_head = this->_createNode(0, 0, value_type());
+				this->_head = this->_createNode(this->_head, this->_head, value_type());
+				this->_head->setNext(this->_head);
+				this->_head->setPrev(this->_head);
 			}
 
 			explicit list (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : _size(0), _alloc(alloc)
 			{
-				this->_head = this->_createNode(0, 0, value_type());
+				this->_head = this->_createNode(this->_head, this->_head, value_type());
+				this->_head->setNext(this->_head);
+				this->_head->setPrev(this->_head);
 				for (size_type i = 0; i < n; i++)
 					this->push_back(val);
 			}
@@ -82,14 +81,18 @@ namespace ft {
 			template <typename InputIterator>
 			list (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(), typename ft::enable_if < !ft::is_integral < InputIterator >::value >::type* = NULL) : _size(0), _alloc(alloc)
 			{
-				this->_head = this->_createNode(0, 0, value_type());
+				this->_head = this->_createNode(this->_head, this->_head, value_type());
+				this->_head->setNext(this->_head);
+				this->_head->setPrev(this->_head);
 				for (InputIterator iter = first; iter != last; ++iter)
 					this->push_back(*iter);
 			}
 
 			list (const list& x) : _size(0), _alloc(x._alloc)
 			{
-				this->_head = this->_createNode(0, 0, value_type());
+				this->_head = this->_createNode(this->_head, this->_head, value_type());
+				this->_head->setNext(this->_head);
+				this->_head->setPrev(this->_head);
 				*this = x;
 			}
 
@@ -147,6 +150,11 @@ namespace ft {
 			const_reverse_iterator	rend(void) const
 			{
 				return (const_reverse_iterator(this->_head));
+			}
+
+			node_pointer	getHead(void) const
+			{
+				return (this->_head);
 			}
 
 			bool	empty(void) const
@@ -341,9 +349,12 @@ namespace ft {
 
 			void	splice(iterator position, list& x, iterator first, iterator last)
 			{
-				for (iterator iter = first; first != last; first++)
+				iterator temp;
+				for (iterator iter = first; iter != last; )
 				{
-					this->splice(position, x, iter++);
+					temp = iter;
+					++iter;
+					this->splice(position, x, temp);
 				}
 			}
 
@@ -417,6 +428,8 @@ namespace ft {
 
 			void	merge(list& x)
 			{
+				if (&x == this)
+					return ;
 				for (iterator thisIter = this->begin(), xIter = x.begin(); thisIter != this->end() && xIter != x.end();)
 				{
 					if (*xIter < *thisIter)
@@ -442,10 +455,13 @@ namespace ft {
 
 			void	sort(void)
 			{
-				for (iterator iter = ++this->begin(); iter != this->end();)
+				for (iterator iter = this->begin(); iter != --this->end();)
 				{
 					if (*iter > iter.getPtr()->getNext()->getData())
+					{
 						this->_swapNextNode(iter.getPtr());
+						iter = this->begin();
+					}
 					else
 						iter++;
 				}
@@ -454,10 +470,13 @@ namespace ft {
 			template < typename Compare >
 			void	sort(Compare comp)
 			{
-				for (iterator iter = ++this->begin(); iter != this->end();)
+				for (iterator iter = this->begin(); iter != --this->end();)
 				{
 					if (comp(*iter, iter.getPtr()->getNext()->getData()))
+					{
 						this->_swapNextNode(iter.getPtr());
+						iter = this->begin();
+					}
 					else
 						iter++;
 				}

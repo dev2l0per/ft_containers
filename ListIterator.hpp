@@ -6,7 +6,13 @@
 
 namespace ft {
 	template < typename _T >
+	class ListIterator;
+	template < typename _T >
 	class ListConstIterator;
+	template < typename _T >
+	class ListReverseIterator;
+	template < typename _T >
+	class ListConstReverseIterator;
 
 	template < typename _T >
 	class ListIterator {
@@ -209,10 +215,12 @@ namespace ft {
 		public:
 			ListReverseIterator() : _ptr(0) {}
 			ListReverseIterator(node_pointer rhs) : _ptr(rhs) {}
+			ListReverseIterator(const ListIterator< _T >& rhs) : _ptr(rhs.getPtr()) {}
+			ListReverseIterator(const ListConstIterator< _T >& rhs) : _ptr(rhs.getPtr()) {}
 			ListReverseIterator(const ListReverseIterator& rhs) : _ptr(rhs._ptr) {}
 			virtual ~ListReverseIterator() {}
 
-			node_pointer	getPtr(void)
+			node_pointer	getPtr(void) const
 			{
 				return (this->_ptr);
 			}
@@ -297,11 +305,13 @@ namespace ft {
 		public:
 			ListConstReverseIterator() : _ptr(0) {}
 			ListConstReverseIterator(node_pointer rhs) : _ptr(rhs) {}
-			ListConstReverseIterator(const ListReverseIterator< _T >& rhs) : _ptr(rhs._ptr) {}
+			ListConstReverseIterator(const ListIterator< _T >& rhs) : _ptr(rhs.getPtr()) {}
+			ListConstReverseIterator(const ListConstIterator< _T >& rhs) : _ptr(rhs.getPtr()) {}
+			ListConstReverseIterator(const ListReverseIterator< _T >& rhs) : _ptr(rhs.getPtr()) {}
 			ListConstReverseIterator(const ListConstReverseIterator& rhs) : _ptr(rhs._ptr) {}
 			virtual ~ListConstReverseIterator() {}
 
-			node_pointer	getPtr(void)
+			node_pointer	getPtr(void) const
 			{
 				return (this->_ptr);
 			}
