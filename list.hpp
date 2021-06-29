@@ -2,6 +2,7 @@
 # define LIST_HPP
 
 # include <iostream>
+# include "Iterator.hpp"
 # include "ListNode.hpp"
 # include "ListIterator.hpp"
 # include "utils.hpp"
@@ -16,10 +17,10 @@ namespace ft {
 			typedef const value_type&	const_reference;
 			typedef value_type*	pointer;
 			typedef const value_type*	const_pointer;
-			typedef ListIterator< value_type >	iterator;
-			typedef ListConstIterator< value_type > const_iterator;
-			typedef ListReverseIterator< value_type > reverse_iterator;
-			typedef ListConstReverseIterator< value_type > const_reverse_iterator;
+			typedef ListIterator< value_type, false >	iterator;
+			typedef ListIterator< value_type, true > const_iterator;
+			typedef ft::reverse_iterator< iterator > reverse_iterator;
+			typedef ft::reverse_iterator< const_iterator > const_reverse_iterator;
 			typedef typename ft::iterator_traits< iterator >::difference_type	difference_type;
 			typedef	std::size_t	size_type;
 
@@ -134,22 +135,22 @@ namespace ft {
 
 			reverse_iterator rbegin(void)
 			{
-				return (reverse_iterator(this->_head->getPrev()));
+				return (reverse_iterator(this->end()));
 			}
 
 			const_reverse_iterator	rbegin(void) const
 			{
-				return (const_reverse_iterator(this->_head->getPrev()));
+				return (const_reverse_iterator(this->end()));
 			}
 
 			reverse_iterator	rend(void)
 			{
-				return (reverse_iterator(this->_head));
+				return (reverse_iterator(this->begin()));
 			}
 
 			const_reverse_iterator	rend(void) const
 			{
-				return (const_reverse_iterator(this->_head));
+				return (const_reverse_iterator(this->begin()));
 			}
 
 			node_pointer	getHead(void) const
@@ -300,13 +301,10 @@ namespace ft {
 
 			void	swap(list& x)
 			{
-				node_pointer	tempHead = x._head;
-				x._head = this->_head;
-				this->_head = tempHead;
-
-				size_type	tempSize = x._size;
-				x._size = this->_size;
-				this->_size = tempSize;
+				char buf[sizeof(list)];
+				memcpy(reinterpret_cast<void *>(buf), reinterpret_cast<void *>(this), sizeof(list));
+				memcpy(reinterpret_cast<void *>(this), reinterpret_cast<void *>(&x), sizeof(list));
+				memcpy(reinterpret_cast<void *>(&x), reinterpret_cast<void *>(buf), sizeof(list));
 			}
 
 			void	resize(size_type n, value_type val = value_type())

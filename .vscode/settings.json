@@ -30,6 +30,7 @@
 		"system_error": "cpp",
 		"tuple": "cpp",
 		"list": "cpp",
-		"ostream": "cpp"
+		"ostream": "cpp",
+		"__config": "cpp"
 	}
 }

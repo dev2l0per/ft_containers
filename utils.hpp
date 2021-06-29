@@ -90,6 +90,18 @@ namespace ft {
 		public:
 			static const bool	value = true;
 	};
+
+	template < typename _Type, typename _constType, bool isConst = false >
+	class typeSelector {
+		public:
+			typedef _Type	type;
+	};
+
+	template < typename _Type, typename _constType>
+	class typeSelector< _Type, _constType, true > {
+		public :
+			typedef _constType	type;
+	};
 }
 
 #endif
