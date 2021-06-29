@@ -254,7 +254,7 @@ namespace ft {
 				} else if (position == this->end())
 				{
 					this->push_back(val);
-					return (this->end());
+					return (--this->end());
 				}
 				node_pointer	prevNode = position.getPtr()->getPrev();
 				node_pointer	newNode = this->_createNode(position.getPtr()->getPrev(), position.getPtr(), val);
@@ -385,17 +385,18 @@ namespace ft {
 
 			void	unique(void)
 			{
-				for (iterator iter = this->begin(); iter.getPtr()->getNext() != this->end().getPtr(); ++iter)
+				for (iterator iter = this->begin(); iter.getPtr() != this->end().getPtr(); ++iter)
 				{
 					while (1)
 					{
-						if (iter.getPtr()->getNext() != this->end().getPtr() && iter.getPtr()->getData() == iter.getPtr()->getNext()->getData())
+						if (iter.getPtr()->getNext() != this->end().getPtr() && *iter == iter.getPtr()->getNext()->getData())
 						{
 							node_pointer	deleteNode = iter.getPtr()->getNext();
 
-							iter.getPtr()->setNext(iter.getPtr()->getNext()->getNext());
+							iter.getPtr()->setNext(deleteNode->getNext());
 							iter.getPtr()->getNext()->setPrev(iter.getPtr());
 							this->_deleteNode(deleteNode);
+							--this->_size;
 						}
 						else {
 							break ;
@@ -407,17 +408,18 @@ namespace ft {
 			template <typename BinaryPredicate>
 			void	unique(BinaryPredicate comp)
 			{
-				for (iterator iter = this->begin(); iter.getPtr()->getNext() != this->end().getPtr(); ++iter)
+				for (iterator iter = this->begin(); iter.getPtr() != this->end().getPtr(); ++iter)
 				{
 					while (1)
 					{
-						if (iter.getPtr()->getNext() != this->end().getPtr() && comp(iter.getPtr()->getData(), iter.getPtr()->getNext()->getData()))
+						if (iter.getPtr()->getNext() != this->end().getPtr() && comp(*iter, iter.getPtr()->getNext()->getData()))
 						{
 							node_pointer	deleteNode = iter.getPtr()->getNext();
 
-							iter.getPtr()->setNext(iter.getPtr()->getNext()->getNext());
+							iter.getPtr()->setNext(deleteNode->getNext());
 							iter.getPtr()->getNext()->setPrev(iter.getPtr());
 							this->_deleteNode(deleteNode);
+							--this->_size;
 						}
 						else {
 							break ;
@@ -472,7 +474,7 @@ namespace ft {
 			{
 				for (iterator iter = this->begin(); iter != --this->end();)
 				{
-					if (comp(*iter, iter.getPtr()->getNext()->getData()))
+					if (comp(iter.getPtr()->getNext()->getData(), *iter))
 					{
 						this->_swapNextNode(iter.getPtr());
 						iter = this->begin();
@@ -518,15 +520,15 @@ namespace ft {
 	template < typename _T >
 	bool	operator< (const list< _T >& lhs, const list< _T >& rhs)
 	{
-		if (lhs.size() < rhs.size())
-			return (true);
-		if (lhs.size() > rhs.size())
-			return (false);
 		for (typename list< _T >::const_iterator lIter = lhs.begin(), rIter = rhs.begin(); lIter != lhs.end(); ++lIter, ++rIter)
 		{
 			if (*lIter != *rIter)
 				return (*lIter < *rIter);
 		}
+		if (lhs.size() < rhs.size())
+			return (true);
+		if (lhs.size() > rhs.size())
+			return (false);
 		return (false);
 	}
 
