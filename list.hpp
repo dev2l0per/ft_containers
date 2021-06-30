@@ -13,10 +13,10 @@ namespace ft {
 		public:
 			typedef _T	value_type;
 			typedef _Alloc	allocator_type;
-			typedef value_type&	reference;
-			typedef const value_type&	const_reference;
-			typedef value_type*	pointer;
-			typedef const value_type*	const_pointer;
+			typedef typename allocator_type::reference	reference;
+			typedef typename allocator_type::const_reference	const_reference;
+			typedef typename allocator_type::pointer	pointer;
+			typedef typename allocator_type::const_pointer	const_pointer;
 			typedef ListIterator< value_type, false >	iterator;
 			typedef ListIterator< value_type, true > const_iterator;
 			typedef ft::reverse_iterator< iterator > reverse_iterator;
@@ -193,11 +193,11 @@ namespace ft {
 				return (this->_head->getPrev()->getData());
 			}
 
-			template <class InputIterator>
-			void	assign(InputIterator first, InputIterator last, typename ft::enable_if< !ft::is_integral< InputIterator >::value, InputIterator >::type* = NULL )
+			template <class _InputIterator>
+			void	assign(_InputIterator first, _InputIterator last, typename ft::enable_if< !ft::is_integral< _InputIterator >::value, _InputIterator >::type* = NULL )
 			{
 				this->clear();
-				for (InputIterator iter = first; iter != last; ++iter)
+				for (_InputIterator iter = first; iter != last; ++iter)
 					this->push_back(*iter);
 			}
 
@@ -272,10 +272,10 @@ namespace ft {
 					this->insert(position, val);
 			}
 
-			template <class InputIterator>
-			void	insert(iterator position, InputIterator first, InputIterator last, typename ft::enable_if < !ft::is_integral < InputIterator >::value, InputIterator >::type* = NULL )
+			template <class _InputIterator>
+			void	insert(iterator position, _InputIterator first, _InputIterator last, typename ft::enable_if < !ft::is_integral < _InputIterator >::value, _InputIterator >::type* = NULL )
 			{
-				for (InputIterator iter = first; iter != last; iter++)
+				for (_InputIterator iter = first; iter != last; iter++)
 				{
 					this->insert(position, *iter);
 				}
@@ -403,8 +403,8 @@ namespace ft {
 				}
 			}
 
-			template <typename BinaryPredicate>
-			void	unique(BinaryPredicate comp)
+			template <typename _BinaryPredicate>
+			void	unique(_BinaryPredicate comp)
 			{
 				for (iterator iter = this->begin(); iter.getPtr() != this->end().getPtr(); ++iter)
 				{
@@ -440,8 +440,8 @@ namespace ft {
 				this->splice(this->end(), x);
 			}
 
-			template < typename Compare >
-			void merge(list& x, Compare comp)
+			template < typename _Compare >
+			void merge(list& x, _Compare comp)
 			{
 				for (iterator thisIter = this->begin(), xIter = x.begin(); thisIter != this->end() && xIter != x.end();)
 				{
@@ -467,8 +467,8 @@ namespace ft {
 				}
 			}
 
-			template < typename Compare >
-			void	sort(Compare comp)
+			template < typename _Compare >
+			void	sort(_Compare comp)
 			{
 				for (iterator iter = this->begin(); iter != --this->end();)
 				{

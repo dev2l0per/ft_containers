@@ -102,6 +102,15 @@ namespace ft {
 		public :
 			typedef _constType	type;
 	};
+
+	template < typename _T >
+	class less {
+		public:
+			bool	operator() (const _T& x, const _T& y) const
+			{
+				return (x < y);
+			}
+	};
 }
 
 #endif

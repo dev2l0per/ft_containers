@@ -1,6 +1,9 @@
-#include "list.hpp"
 #include "main.hpp"
-
+#include "vector.hpp"
+#include "list.hpp"
+#include <deque>
+#include <vector>
+#include <iostream>
 #define TESTED_TYPE foo<int>
 
 int		main(void)

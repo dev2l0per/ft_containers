@@ -18,6 +18,7 @@ namespace ft {
 			typedef typename ft::typeSelector< ListNode< value_type >, const ListNode< value_type >, _isConst>::type	node_type;
 			typedef typename ft::typeSelector< ListNode< value_type >*, const ListNode< value_type >*, _isConst>::type node_pointer;
 			typedef typename ft::typeSelector< ListNode< value_type >&, const ListNode< value_type >&, _isConst>::type node_reference;
+
 		private:
 			node_pointer	_ptr;
 
