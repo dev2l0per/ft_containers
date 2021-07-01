@@ -2,6 +2,7 @@
 # define RBTREE_HPP
 
 # include <iostream>
+# include <vector>
 
 # define _RED	true
 # define _BLACK	false
@@ -10,6 +11,7 @@ namespace ft {
 	template < typename _T, typename _Compare, typename _Alloc = std::allocator< _T > >
 	class RBTree {
 		public:
+			std::vector< _T > vector;
 			typedef _T	value_type;
 			typedef _Compare	value_compare;
 			typedef _Alloc	allocator_type;
@@ -47,7 +49,7 @@ namespace ft {
 			node_pointer	_createNode(const value_type& val = value_type())
 			{
 				node_pointer node = this->_alloc.allocate(1);
-				node->_data = val;
+				this->_alloc.construct(node, val);
 
 				return (node);
 			}
@@ -226,9 +228,10 @@ namespace ft {
 				node_pointer	rightChild = node->_rightChild;
 				node_pointer	parent = node->_parent;
 
-				if (rightChild->_leftChild != NULL)
+				if (rightChild->_leftChild != this->_nil)
 					rightChild->_leftChild->_parent = node;
 				
+
 				node->_rightChild = rightChild->_leftChild;
 				node->_parent = rightChild;
 				rightChild->_leftChild = node;
@@ -240,7 +243,9 @@ namespace ft {
 						parent->_leftChild = rightChild;
 					else
 						parent->_rightChild = rightChild;
+					return ;
 				}
+				this->_root = rightChild;
 			}
 
 			void	_rotateRight(node_pointer node)
@@ -248,7 +253,7 @@ namespace ft {
 				node_pointer	leftChild = node->_leftChild;
 				node_pointer	parent = node->_parent;
 
-				if (leftChild != NULL)
+				if (leftChild != this->_nil)
 					leftChild->_rightChild->_parent = node;
 				
 				node->_leftChild = leftChild->_rightChild;
@@ -263,6 +268,7 @@ namespace ft {
 					else
 						parent->_leftChild = leftChild;
 				}
+				this->_root = leftChild;
 			}
 
 			node_pointer	_getSibling(node_pointer node)
@@ -325,28 +331,34 @@ namespace ft {
 					for (; findNode->_leftChild != this->_nil; findNode = findNode->_leftChild) {
 						curNode = findNode;
 					}
-					bool	originalColor = curNode->_color;
 					if (curNode->_leftChild == findNode)
 						curNode->_leftChild = findNode->_rightChild;
 					else
-						curNode->_rightChild = findNode->rightChild;
+						curNode->_rightChild = findNode->_rightChild;
 					node->_data = findNode->_data;
 					node = findNode;
 				}
+				this->_root->_parent = NULL;
 			}
 
 		public:
 			RBTree(const allocator_type& alloc = allocator_type()) : _alloc(alloc) {
-				std::cout << "HELLO" << std::endl;
-				
 				this->_nil = _createNode();
 				this->_nil->_color = _BLACK;
+				this->_nil->_leftChild = this->_nil->_rightChild = this->_nil;
 				this->_root = this->_nil;
 			}
 			virtual ~RBTree() {}
 
-			void	insertNode(node_pointer node)
+			node_pointer	getRoot(void) const
 			{
+				return (this->_root);
+			}
+
+			void	insertNode(const value_type& val)
+			{
+				node_pointer node = this->_createNode(val);
+
 				if (this->_root == this->_nil)
 				{
 					this->_root = node;
@@ -376,52 +388,9 @@ namespace ft {
 				if (delNode == this->_nil)
 					return ;
 				
-				// bool	originalColor = delNode->_color;
-
-				// if (delNode->_leftChild == this->_nil && delNode->_rightChild == this->_nil) {
-				// 	if (node == this->_root)
-				// 		this->_root = this->_nil;
-				// 	else if (node == delNode->_parent->_leftChild)
-				// 		delNode->_parent->_leftChild = this->_nil;
-				// 	else
-				// 		delNode->_parent->_rightChild = this->_nil;
-				// }
-				// else if (delNode->_leftChild != this->_nil && delNode->_rightChild == this->_nil) {
-				// 	if (node == this->_root)
-				// 		this->_root = delNode->_leftChild;
-				// 	else if (node == delNode->_parent->_leftChild)
-				// 		delNode->_parent->_leftChild = delNode->_leftChild;
-				// 	else
-				// 		delNode->_parent->_rightChild = delNode->_leftChild;
-				// }
-				// else if (delNode->_leftChild == this->_nil && delNode->_rightChild != this->_nil) {
-				// 	if (delNode == this->_root)
-				// 		this->_root = delNode->_rightChild;
-				// 	else if (delNode == delNode->_parent->_leftChild)
-				// 		delNode->_parent->_leftChild = delNode->_rightChild;
-				// 	else
-				// 		delNode->_parent->_rightChild = delNode->_rightChild;
-				// }
-				// else {
-				// 	node_pointer	curNode = delNode;
-				// 	node_pointer	findNode = delNode->_rightChild;
-				// 	for (; findNode->_leftChild != this->_nil; findNode = findNode->_leftChild) {
-				// 		curNode = findNode;
-				// 	}
-				// 	originalColor = findNode->_color;
-				// 	if (curNode->_leftChild == findNode)
-				// 		curNode->_leftChild = findNode->_rightChild;
-				// 	else
-				// 		curNode->_rightChild = findNode->_rightChild;
-				// 	findNode->_leftChild = delNode->_leftChild;
-				// 	findNode->_rightChild = delNode->_rightChild;
-				// 	originalColor = findNode->_color;
-				// }
-
-				// if (originalColor == _BLACK)
-				// 	this->_deleteCase1()
-				// this->_deleteNode(delNode);				
-				// this->_deleteCase1(delNode);
+				this->_deleteNodeHelper(delNode);
+				this->_deleteNode(delNode);
+				this->_deleteCase1(delNode);
 			}
 
 			node_pointer	findNode(const value_type& val)
@@ -441,7 +410,103 @@ namespace ft {
 					}
 				}
 				
-				return (this->_nil)
+				return (this->_nil);
+			}
+
+			void show_tree(RBNode* root, std::string indent, bool last)
+			{
+				// print the tree structure on the screen
+				// if (root == this->_nil)
+				// {
+				// 	std::cout << indent;
+				// 	if (last)
+				// 	{
+				// 		std::cout << "R----";
+				// 		indent += "     ";
+				// 	}
+				// 	else
+				// 	{
+				// 		std::cout << "L----";
+				// 		indent += "|    ";
+				// 	}
+
+				// 	// std::string sColor = (root->_color == RED) ? "RED" : "BLACK";
+				// 	std::cout << "NIL" << std::endl;
+				// }
+				if (root != this->_nil)
+				{
+					std::cout << indent;
+					if (last)
+					{
+						std::cout << "R----";
+						indent += "     ";
+					}
+					else
+					{
+						std::cout << "L----";
+						indent += "|    ";
+					}
+
+					std::string sColor = (root->_color == _RED) ? "RED" : "BLACK";
+					std::cout << root->_data << "(" << sColor << ")" << std::endl;
+					show_tree(root->_leftChild, indent, false);
+					show_tree(root->_rightChild, indent, true);
+				}
+			}
+
+			void printInorder(RBNode* root)
+			{
+				if (root == this->_nil)
+					return ;
+				this->printInorder(root->_leftChild);
+				this->vector.push_back(root->_data);
+				std::cout << root->_data << " ";
+				this->printInorder(root->_rightChild);
+			}
+
+			void check_traversal()
+			{
+				RBNode* curr = this->_root;
+				RBNode* prev = NULL;
+				while (1)
+				{
+					// std::cout << curr->_data << std::endl;
+					this->vector.push_back(curr->_data);
+					if (prev == curr->_rightChild)
+					{
+						prev = curr;
+						if (curr->_parent != NULL)
+							curr = curr->_parent;
+						else
+							return ;
+						continue ;
+					}
+					else if (prev == curr->_leftChild)
+					{
+						prev = curr;
+						if (curr->_rightChild == this->_nil)
+							curr = curr->_parent;
+						else
+							curr = curr->_rightChild;
+						continue ;
+					}
+
+					if (curr->_leftChild != this->_nil)
+					{
+						prev = curr;
+						curr = curr->_leftChild;
+						continue ;	
+					}
+					if (curr->_rightChild != this->_nil)
+					{
+						prev = curr;
+						curr = curr->_rightChild;
+						continue ;
+					}
+					prev = curr;
+					curr = curr->_parent;
+					continue ;
+				}
 			}
 	};
 }
