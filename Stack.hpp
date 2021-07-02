@@ -12,7 +12,7 @@ namespace ft {
 			typedef _Container	container_type;
 			typedef std::size_t	size_type;
 		
-		private:
+		protected:
 			container_type	_container;
 
 		private:

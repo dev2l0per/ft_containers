@@ -23,7 +23,7 @@ namespace ft {
 			typedef typename ft::iterator_traits< iterator >::difference_type	difference_type;
 			typedef	std::size_t	size_type;
 		
-		private:
+		protected:
 			value_type	*_arr;
 			size_type	_size;
 			size_type	_capacity;

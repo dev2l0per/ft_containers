@@ -142,6 +142,7 @@ namespace ft {
 
 			void	_deleteCase1(node_pointer node)
 			{
+				std::cout << "Delete Case 1 Checking.." << std::endl;
 				if (node->_parent != NULL)
 					this->_deleteCase2(node);
 			}
@@ -150,6 +151,7 @@ namespace ft {
 			{
 				node_pointer	sibling = this->_getSibling(node);
 
+				std::cout << "Delete Case 2 Checking.." << std::endl;
 				if (sibling->_color == _RED) {
 					node->_parent->_color = _RED;
 					sibling->_color = _BLACK;
@@ -158,12 +160,14 @@ namespace ft {
 					else
 						this->_rotateRight(node->_parent);
 				}
+				this->_deleteCase3(node);
 			}
 
 			void	_deleteCase3(node_pointer node)
 			{
 				node_pointer	sibling = this->_getSibling(node);
 
+				std::cout << "Delete Case 3 Checking.." << std::endl;
 				if ((node->_parent->_color == _BLACK) && (sibling->_color == _BLACK) &&
 				(sibling->_leftChild->_color == _BLACK) && (sibling->_rightChild->_color == _BLACK)) {
 					sibling->_color = _RED;
@@ -177,6 +181,7 @@ namespace ft {
 			{
 				node_pointer	sibling = this->_getSibling(node);
 
+				std::cout << "Delete Case 4 Checking.." << std::endl;
 				if ((node->_parent->_color == _RED) && (sibling->_color == _BLACK) &&
 				(sibling->_leftChild->_color == _BLACK) && (sibling->_rightChild->_color == _BLACK)) {
 					sibling->_color = _RED;
@@ -190,6 +195,7 @@ namespace ft {
 			{
 				node_pointer	sibling = this->_getSibling(node);
 
+				std::cout << "Delete Case 5 Checking.." << std::endl;
 				if (sibling->_color == _BLACK) {
 					if ((node == node->_parent->_leftChild) && (sibling->_rightChild->_color == _BLACK) &&
 					(sibling->_leftChild->_color == _RED)) {
@@ -211,9 +217,10 @@ namespace ft {
 			{
 				node_pointer	sibling = this->_getSibling(node);
 
+				std::cout << "Delete Case 6 Checking.." << std::endl;
 				sibling->_color = node->_parent->_color;
 				node->_parent->_color = _BLACK;
-				if (node == node->_parent->_left) {
+				if (node == node->_parent->_leftChild) {
 					sibling->_rightChild->_color = _BLACK;
 					this->_rotateLeft(node->_parent);
 				}
@@ -225,50 +232,46 @@ namespace ft {
 
 			void	_rotateLeft(node_pointer node)
 			{
-				node_pointer	rightChild = node->_rightChild;
-				node_pointer	parent = node->_parent;
+				node_pointer	tempNode;
 
-				if (rightChild->_leftChild != this->_nil)
-					rightChild->_leftChild->_parent = node;
-				
+				tempNode = node->_rightChild;
+				node->_rightChild = tempNode->_leftChild;
 
-				node->_rightChild = rightChild->_leftChild;
-				node->_parent = rightChild;
-				rightChild->_leftChild = node;
-				rightChild->_parent = parent;
+				if (tempNode->_leftChild != this->_nil)
+					tempNode->_leftChild->_parent = node;
+				tempNode->_parent = node->_parent;
 
-				if (parent != NULL)
-				{
-					if (parent->_leftChild == node)
-						parent->_leftChild = rightChild;
-					else
-						parent->_rightChild = rightChild;
-					return ;
-				}
-				this->_root = rightChild;
+				if (node->_parent == NULL)
+					this->_root = tempNode;
+				else if (node == node->_parent->_leftChild)
+					node->_parent->_leftChild = tempNode;
+				else
+					node->_parent->_rightChild = tempNode;
+				tempNode->_leftChild = node;
+				node->_parent = tempNode;
+				this->_root->_parent = NULL;
 			}
 
 			void	_rotateRight(node_pointer node)
 			{
-				node_pointer	leftChild = node->_leftChild;
-				node_pointer	parent = node->_parent;
+				node_pointer	tempNode;
 
-				if (leftChild != this->_nil)
-					leftChild->_rightChild->_parent = node;
-				
-				node->_leftChild = leftChild->_rightChild;
-				node->_parent = leftChild;
-				leftChild->_rightChild = node;
-				leftChild->_parent = parent;
+				tempNode = node->_leftChild;
+				node->_leftChild = tempNode->_rightChild;
 
-				if (parent != NULL)
-				{
-					if (parent->_rightChild == node)
-						parent->_rightChild = leftChild;
-					else
-						parent->_leftChild = leftChild;
-				}
-				this->_root = leftChild;
+				if (tempNode->_rightChild != this->_nil)
+					tempNode->_rightChild->_parent = node;
+				tempNode->_parent = node->_parent;
+
+				if (node->_parent == NULL)
+					this->_root = tempNode;
+				else if (node == node->_parent->_leftChild)
+					node->_parent->_leftChild = tempNode;
+				else
+					node->_parent->_rightChild = tempNode;
+				tempNode->_rightChild = node;
+				node->_parent = tempNode;
+				this->_root->_parent = NULL;
 			}
 
 			node_pointer	_getSibling(node_pointer node)
@@ -299,46 +302,18 @@ namespace ft {
 				}
 			}
 
-			void	_deleteNodeHelper(node_pointer node)
+			void	_transPlant(node_pointer swapA, node_pointer swapB)
 			{
-				if (node->_leftChild == this->_nil && node->_rightChild == this->_nil) {
-					if (node == this->_root)
-						this->_root = this->_nil;
-					else if (node == node->_parent->_leftChild)
-						node->_parent->_leftChild = this->_nil;
-					else
-						node->_parent->_rightChild = this->_nil;
+				if (swapA->_parent == NULL) {
+					this->_root = swapB;
 				}
-				else if (node->_leftChild != this->_nil && node->_rightChild == this->_nil) {
-					if (node == this->_root)
-						this->_root = node->_leftChild;
-					else if (node == node->_parent->_leftChild)
-						node->_parent->_leftChild = node->_leftChild;
-					else
-						node->_parent->_rightChild = node->_leftChild;
-				}
-				else if (node->_leftChild == this->_nil && node->_rightChild != this->_nil) {
-					if (node == this->_root)
-						this->_root = node->_rightChild;
-					else if (node == node->_parent->_leftChild)
-						node->_parent->_leftChild = node->_rightChild;
-					else
-						node->_parent->_rightChild = node->_rightChild;
+				else if (swapA == swapA->_parent->_leftChild) {
+					swapA->_parent->_leftChild = swapB;
 				}
 				else {
-					node_pointer	curNode = node;
-					node_pointer	findNode = node->_rightChild;
-					for (; findNode->_leftChild != this->_nil; findNode = findNode->_leftChild) {
-						curNode = findNode;
-					}
-					if (curNode->_leftChild == findNode)
-						curNode->_leftChild = findNode->_rightChild;
-					else
-						curNode->_rightChild = findNode->_rightChild;
-					node->_data = findNode->_data;
-					node = findNode;
+					swapA->_parent->_rightChild = swapB;
 				}
-				this->_root->_parent = NULL;
+				swapB->_parent = swapA->_parent;
 			}
 
 		public:
@@ -357,7 +332,14 @@ namespace ft {
 
 			void	insertNode(const value_type& val)
 			{
+				node_pointer checkExisted = this->findNode(val);
+
+				if (checkExisted != this->_nil)
+					return ;
+
 				node_pointer node = this->_createNode(val);
+
+				std::cout << val << "is Creating.." << std::endl;
 
 				if (this->_root == this->_nil)
 				{
@@ -383,56 +365,111 @@ namespace ft {
 				if (this->_root == this->_nil)
 					return ;
 				
-				node_pointer delNode = this->findNode(val);
-				
+				node_pointer	delNode = this->findNode(val);
 				if (delNode == this->_nil)
 					return ;
-				
-				this->_deleteNodeHelper(delNode);
+				std::cout << val << " is deleting.." << std::endl;
+				node_pointer	originPos;
+				bool	tempColor;
+
+				tempColor = delNode->_color;
+				if (delNode->_leftChild == this->_nil) {
+					// originPos = delNode->_rightChild;
+					this->_transPlant(delNode, delNode->_rightChild);
+				}
+				else if (delNode->_rightChild == this->_nil) {
+					// originPos = delNode->_leftChild;
+					this->_transPlant(delNode, delNode->_leftChild);
+				}
+				else {
+					node_pointer	tempNode;
+					if (delNode->_leftChild != this->_nil) { // tempNode = 삭제 노드의 왼쪽 트리 중 최대값 노드
+						tempNode = delNode->_leftChild;
+						for (; tempNode->_rightChild != this->_nil; tempNode = tempNode->_rightChild)
+							;
+					}
+					else { // tempNode = 삭제 노드의 오른쪽 트리 중 최솟값 노드
+						tempNode = delNode->_rightChild;
+						for (; tempNode->_leftChild != this->_nil; tempNode = tempNode->_leftChild)
+							;
+					}
+					tempColor = delNode->_color;
+
+					this->_transPlant(tempNode, tempNode->_rightChild);
+					tempNode->_rightChild = delNode->_rightChild;
+					tempNode->_rightChild->_parent = tempNode;
+
+					this->_transPlant(delNode, tempNode);
+					tempNode->_leftChild = delNode->_leftChild;
+					tempNode->_leftChild->_parent = tempNode;
+					tempNode->_color = tempColor;
+
+					originPos = delNode;
+				}
+				std::cout << "Delete Node Complete" << std::endl;
+				this->show_tree(this->_root, "", true);
+				if (tempColor == _BLACK)
+					this->_deleteCase1(originPos);
+				std::cout << "Delete Case Checking Complete" << std::endl;
+				this->show_tree(this->_root, "", true);
 				this->_deleteNode(delNode);
-				this->_deleteCase1(delNode);
 			}
 
 			node_pointer	findNode(const value_type& val)
 			{
-				node_pointer	curNode = this->_root;
-
-				while (curNode != this->_nil)
+				for (node_pointer targetNode = this->_root; targetNode != this->_nil;)
 				{
-					if (this->_comp(curNode->_data, val))
-						curNode = curNode->_leftChild;
-					else
+					if (this->_comp(targetNode->_data, val))
 					{
-						if (this->_comp(val, curNode->_data))
-							curNode = curNode->_rightChild;
+						targetNode = targetNode->_rightChild;
+					} else {
+						if (this->_comp(val, targetNode->_data))
+							targetNode = targetNode->_leftChild;
 						else
-							return (curNode);
+							return (targetNode);
 					}
 				}
-				
+
 				return (this->_nil);
 			}
 
 			void show_tree(RBNode* root, std::string indent, bool last)
 			{
 				// print the tree structure on the screen
-				// if (root == this->_nil)
-				// {
-				// 	std::cout << indent;
-				// 	if (last)
-				// 	{
-				// 		std::cout << "R----";
-				// 		indent += "     ";
-				// 	}
-				// 	else
-				// 	{
-				// 		std::cout << "L----";
-				// 		indent += "|    ";
-				// 	}
+				if (root == this->_root && this->_root != this->_nil && this->_root != NULL && this->_root->_parent == NULL)
+				{
+					std::cout << indent;
+					if (last)
+					{
+						// std::cout << "R----";
+						indent += "    ";
+					}
+					else
+					{
+						// std::cout << "L----";
+						indent += "|    ";
+					}
 
-				// 	// std::string sColor = (root->_color == RED) ? "RED" : "BLACK";
-				// 	std::cout << "NIL" << std::endl;
-				// }
+					// std::string sColor = (root->_color == RED) ? "RED" : "BLACK";
+					std::cout << "NULL " << std::endl;;
+				}
+				if (root == this->_nil)
+				{
+					std::cout << indent;
+					if (last)
+					{
+						std::cout << "R----";
+						indent += "     ";
+					}
+					else
+					{
+						std::cout << "L----";
+						indent += "|    ";
+					}
+
+					// std::string sColor = (root->_color == RED) ? "RED" : "BLACK";
+					std::cout << "NIL" << std::endl;
+				}
 				if (root != this->_nil)
 				{
 					std::cout << indent;

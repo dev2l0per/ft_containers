@@ -30,11 +30,12 @@ namespace ft {
 
 			typedef typename allocator_type::template rebind< node_type >::other node_alloc;
 
-		private:
+		protected:
 			node_pointer	_head;
 			size_type	_size;
 			node_alloc	_alloc;
 
+		private:
 			node_pointer	_createNode(node_pointer prev, node_pointer next, value_type value)
 			{
 				node_pointer	newNode = this->_alloc.allocate(1);
@@ -151,11 +152,6 @@ namespace ft {
 			const_reverse_iterator	rend(void) const
 			{
 				return (const_reverse_iterator(this->begin()));
-			}
-
-			node_pointer	getHead(void) const
-			{
-				return (this->_head);
 			}
 
 			bool	empty(void) const

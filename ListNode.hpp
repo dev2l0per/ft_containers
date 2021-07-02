@@ -4,7 +4,7 @@
 namespace ft {
 	template < typename _T >
 	class ListNode {
-		private:
+		protected:
 			ListNode *_prev;
 			ListNode *_next;
 			_T	_data;
