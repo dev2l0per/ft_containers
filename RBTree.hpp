@@ -100,7 +100,7 @@ namespace ft {
 				node_pointer	uncle = this->_getUncle(node);
 				node_pointer	grandParent;
 
-				if ((uncle != NULL) && (uncle->_color == _RED))
+				if ((uncle != this->_nil) && (uncle != NULL) && (uncle->_color == _RED))
 				{
 					node->_parent->_color = _BLACK;
 					uncle->_color = _BLACK;
@@ -138,96 +138,6 @@ namespace ft {
 					this->_rotateRight(grandParent);
 				else
 					this->_rotateLeft(grandParent);
-			}
-
-			void	_deleteCase1(node_pointer node)
-			{
-				std::cout << "Delete Case 1 Checking.." << std::endl;
-				if (node->_parent != NULL)
-					this->_deleteCase2(node);
-			}
-
-			void	_deleteCase2(node_pointer node)
-			{
-				node_pointer	sibling = this->_getSibling(node);
-
-				std::cout << "Delete Case 2 Checking.." << std::endl;
-				if (sibling->_color == _RED) {
-					node->_parent->_color = _RED;
-					sibling->_color = _BLACK;
-					if (node == node->_parent->_leftChild)
-						this->_rotateLeft(node->_parent);
-					else
-						this->_rotateRight(node->_parent);
-				}
-				this->_deleteCase3(node);
-			}
-
-			void	_deleteCase3(node_pointer node)
-			{
-				node_pointer	sibling = this->_getSibling(node);
-
-				std::cout << "Delete Case 3 Checking.." << std::endl;
-				if ((node->_parent->_color == _BLACK) && (sibling->_color == _BLACK) &&
-				(sibling->_leftChild->_color == _BLACK) && (sibling->_rightChild->_color == _BLACK)) {
-					sibling->_color = _RED;
-					this->_deleteCase1(node->_parent);
-				}
-				else
-					this->_deleteCase4(node);
-			}
-
-			void	_deleteCase4(node_pointer node)
-			{
-				node_pointer	sibling = this->_getSibling(node);
-
-				std::cout << "Delete Case 4 Checking.." << std::endl;
-				if ((node->_parent->_color == _RED) && (sibling->_color == _BLACK) &&
-				(sibling->_leftChild->_color == _BLACK) && (sibling->_rightChild->_color == _BLACK)) {
-					sibling->_color = _RED;
-					node->_parent->_color = _BLACK;
-				}
-				else
-					this->_deleteCase5(node);
-			}
-
-			void	_deleteCase5(node_pointer node)
-			{
-				node_pointer	sibling = this->_getSibling(node);
-
-				std::cout << "Delete Case 5 Checking.." << std::endl;
-				if (sibling->_color == _BLACK) {
-					if ((node == node->_parent->_leftChild) && (sibling->_rightChild->_color == _BLACK) &&
-					(sibling->_leftChild->_color == _RED)) {
-						sibling->_color = _RED;
-						sibling->_leftChild->_color = _BLACK;
-						this->_rotateRight(sibling);
-					}
-					else if ((node == node->_parent->_rightChild) && (sibling->_leftChild->_color == _BLACK) &&
-					(sibling->_rightChild->_color == _RED)) {
-						sibling->_color = _RED;
-						sibling->_rightChild->_color = _BLACK;
-						this->_rotateLeft(sibling);
-					}
-				}
-				this->_deleteCase6(node);
-			}
-
-			void	_deleteCase6(node_pointer node)
-			{
-				node_pointer	sibling = this->_getSibling(node);
-
-				std::cout << "Delete Case 6 Checking.." << std::endl;
-				sibling->_color = node->_parent->_color;
-				node->_parent->_color = _BLACK;
-				if (node == node->_parent->_leftChild) {
-					sibling->_rightChild->_color = _BLACK;
-					this->_rotateLeft(node->_parent);
-				}
-				else {
-					sibling->_leftChild->_color = _BLACK;
-					this->_rotateRight(node->_parent);
-				}
 			}
 
 			void	_rotateLeft(node_pointer node)
@@ -277,9 +187,9 @@ namespace ft {
 			node_pointer	_getSibling(node_pointer node)
 			{
 				if (node == node->_parent->_leftChild)
-					return node->_parent->_rightChild;
+					return (node->_parent->_rightChild);
 				else
-					return node->_parent->_leftChild;
+					return (node->_parent->_leftChild);
 			}
 
 			void	_insertNodeHelper(node_pointer insertRoot, node_pointer node)
@@ -314,6 +224,74 @@ namespace ft {
 					swapA->_parent->_rightChild = swapB;
 				}
 				swapB->_parent = swapA->_parent;
+			}
+
+			void	_deleteFixUp(node_pointer node)
+			{
+				node_pointer	sibling = NULL;
+
+				while ((node != this->_root) && (node->_color == _BLACK)) {
+					if (node == node->_parent->_leftChild) {
+						sibling = this->_getSibling(node);
+
+						if (sibling->_color == _RED) {
+							sibling->_color = _BLACK;
+							node->_parent->_color = _RED;
+							this->_rotateLeft(node->_parent);
+							sibling = node->_parent->_rightChild;
+						}
+
+						if (sibling->_leftChild->_color == _BLACK && sibling->_rightChild->_color == _BLACK) {
+							sibling->_color = _RED;
+							node = node->_parent;
+						}
+						else if (sibling->_leftChild->_color == _RED && sibling->_rightChild->_color == _BLACK) {
+							sibling->_color = _RED;
+							sibling->_leftChild->_color = _BLACK;
+							this->_rotateRight(sibling);
+							sibling = this->_getSibling(node);
+							// sibling = node->_parent->_rightChild;
+						}
+
+						if (sibling->_rightChild->_color == _RED) {
+							sibling->_color = node->_parent->_color;
+							sibling->_rightChild->_color = _BLACK;
+							node->_parent->_color = _BLACK;
+							this->_rotateLeft(node->_parent);
+							node = this->_root;
+						}
+					}
+					else {
+						sibling = this->_getSibling(node);
+
+						if (sibling->_color == _RED) {
+							sibling->_color = _BLACK;
+							node->_parent->_color = _RED;
+							this->_rotateRight(node->_parent);
+							sibling = this->_getSibling(node);
+						}
+
+						if (sibling->_leftChild->_color == _BLACK && sibling->_rightChild->_color == _BLACK) {
+							sibling->_color = _RED;
+							node = node->_parent;
+						}
+						else if (sibling->_rightChild->_color == _RED && sibling->_leftChild->_color == _BLACK) {
+							sibling->_color = _RED;
+							sibling->_rightChild->_color = _BLACK;
+							this->_rotateLeft(sibling);
+							sibling = this->_getSibling(node);
+						}
+
+						if (sibling->_leftChild->_color == _RED) {
+							sibling->_color = node->_parent->_color;
+							sibling->_leftChild->_color = _BLACK;
+							node->_parent->_color = _BLACK;
+							this->_rotateRight(node->_parent);
+							node = this->_root;
+						}
+					}
+				}
+				node->_color = _BLACK;
 			}
 
 		public:
@@ -374,26 +352,20 @@ namespace ft {
 
 				tempColor = delNode->_color;
 				if (delNode->_leftChild == this->_nil) {
-					// originPos = delNode->_rightChild;
+					originPos = delNode->_rightChild;
 					this->_transPlant(delNode, delNode->_rightChild);
 				}
 				else if (delNode->_rightChild == this->_nil) {
-					// originPos = delNode->_leftChild;
+					originPos = delNode->_leftChild;
 					this->_transPlant(delNode, delNode->_leftChild);
 				}
 				else {
 					node_pointer	tempNode;
-					if (delNode->_leftChild != this->_nil) { // tempNode = 삭제 노드의 왼쪽 트리 중 최대값 노드
-						tempNode = delNode->_leftChild;
-						for (; tempNode->_rightChild != this->_nil; tempNode = tempNode->_rightChild)
-							;
-					}
-					else { // tempNode = 삭제 노드의 오른쪽 트리 중 최솟값 노드
-						tempNode = delNode->_rightChild;
-						for (; tempNode->_leftChild != this->_nil; tempNode = tempNode->_leftChild)
-							;
-					}
-					tempColor = delNode->_color;
+					tempNode = delNode->_rightChild;
+					for (; tempNode->_leftChild != this->_nil; tempNode = tempNode->_leftChild)
+						;
+					originPos = tempNode->_rightChild;
+					tempColor = tempNode->_color;
 
 					this->_transPlant(tempNode, tempNode->_rightChild);
 					tempNode->_rightChild = delNode->_rightChild;
@@ -402,15 +374,14 @@ namespace ft {
 					this->_transPlant(delNode, tempNode);
 					tempNode->_leftChild = delNode->_leftChild;
 					tempNode->_leftChild->_parent = tempNode;
-					tempNode->_color = tempColor;
-
-					originPos = delNode;
+					tempNode->_color = delNode->_color;
+					std::cout << this->_nil << std::endl;
 				}
 				std::cout << "Delete Node Complete" << std::endl;
 				this->show_tree(this->_root, "", true);
 				if (tempColor == _BLACK)
-					this->_deleteCase1(originPos);
-				std::cout << "Delete Case Checking Complete" << std::endl;
+					this->_deleteFixUp(originPos);
+				this->_nil->_parent = NULL; // 3번째 if 분기에서 nil 노드를 픽스업을 하기 위한 기준을 저장하기 위한 임시 노드로써 사용을 했기 때문에 원래 의도 대로 nil의 부모는 다시 NULL로써 초기화 하여 원래의 nil 노드의 의도로 되돌리기.
 				this->show_tree(this->_root, "", true);
 				this->_deleteNode(delNode);
 			}
