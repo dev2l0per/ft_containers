@@ -301,6 +301,14 @@ namespace ft {
 				this->_nil->_leftChild = this->_nil->_rightChild = this->_nil;
 				this->_root = this->_nil;
 			}
+
+			RBTree(const RBTree& x) : _alloc(x._alloc), _comp(x._comp) {
+				this->_nil = _createNode();
+				this->_nil->_color = _BLACK;
+				this->_nil->_leftChild = this->_nil->_rightChild = this->_nil;
+				this->_root = this->_nil;
+			}
+
 			virtual ~RBTree() {}
 
 			node_pointer	getRoot(void) const
@@ -386,7 +394,7 @@ namespace ft {
 				this->_deleteNode(delNode);
 			}
 
-			node_pointer	findNode(const value_type& val)
+			node_pointer	findNode(const value_type& val) const
 			{
 				for (node_pointer targetNode = this->_root; targetNode != this->_nil;)
 				{
@@ -401,6 +409,48 @@ namespace ft {
 					}
 				}
 
+				return (this->_nil);
+			}
+
+			node_pointer	getNextNode(const node_pointer node) const
+			{
+				if (node == this->_nil)
+					return (this->_nil);
+				
+				if (node->_rightChild != this->_nil) {
+					node_pointer	curNode = node->_rightChild;
+					for (; curNode->_leftChild != this->_nil; curNode = curNode->_leftChild)
+						;
+					return (curNode);
+				}
+				
+				for (node_pointer curNode = node; true; curNode = curNode->_parent) {
+					if (curNode->_parent == NULL)
+						return (this->_nil);
+					if (curNode == curNode->_parent->_leftChild)
+						return (curNode->_parent);
+				}
+				return (this->_nil);
+			}
+
+			node_pointer	getPrevNode(const node_pointer node) const
+			{
+				if (node == this->_nil)
+					return (this->_nil);
+				
+				if (node->_leftChild != this->_nil) {
+					node_pointer = curNode = node->_leftChild;
+					for (; curNode->_rightChild != this->_nil; curNode = curNode->_rightChild)
+						;
+					return (curNode);
+				}
+
+				for (node_pointer curNode = node; true; curNode = curNode->_parent) {
+					if (curNode->_parent == NULL)
+						return (this->_nil);
+					if (curNode == curNode->_parent->_rightChild)
+						return (curNode->_parent);
+				}
 				return (this->_nil);
 			}
 
