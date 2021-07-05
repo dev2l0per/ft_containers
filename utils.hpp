@@ -111,6 +111,32 @@ namespace ft {
 				return (x < y);
 			}
 	};
+
+	template < typename _InputIterator1, typename _InputIterator2 >
+	bool	equal (_InputIterator1 first1, _InputIterator1 last1, _InputIterator2 first2) {
+		while (first1 != last1) {
+			if (!(*first1 == last1))
+				return (false);
+			++first1;
+			++first2;
+		}
+		
+		return (true);
+	}
+
+	template < typename _InputIterator1, typename _InputIterator2 >
+	bool	lexicographical_compare (_InputIterator1 first1, _InputIterator1 last1, _InputIterator2 first2, _InputIterator2 last2) {
+		while (first1 != last1) {
+			if (first2 == last2 || *first2 < *first1)
+				return (false);
+			else if (*first1 < *first2)
+				return (true);
+			++first1;
+			++first2;
+		}
+
+		return (first2 != last2);
+	}
 }
 
 #endif

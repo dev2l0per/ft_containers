@@ -81,7 +81,7 @@ namespace ft {
 			}
 
 			template <typename InputIterator>
-			list (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(), typename ft::enable_if < !ft::is_integral < InputIterator >::value >::type* = NULL) : _size(0), _alloc(alloc)
+			list (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(), typename ft::enable_if < !ft::is_integral < InputIterator >::value, InputIterator >::type* = NULL) : _size(0), _alloc(alloc)
 			{
 				this->_head = this->_createNode(this->_head, this->_head, value_type());
 				this->_head->setNext(this->_head);
@@ -497,12 +497,13 @@ namespace ft {
 	{
 		if (lhs.size() != rhs.size())
 			return (false);
-		for (typename list< _T >::const_iterator lIter = lhs.begin(), rIter = rhs.begin(); lIter != lhs.end();)
-		{
-			if (*(lIter++) != *(rIter++))
-				return (false);
-		}
-		return (true);
+		return (ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
+		// for (typename list< _T >::const_iterator lIter = lhs.begin(), rIter = rhs.begin(); lIter != lhs.end();)
+		// {
+		// 	if (*(lIter++) != *(rIter++))
+		// 		return (false);
+		// }
+		// return (true);
 	}
 
 	template < typename _T >
@@ -514,16 +515,17 @@ namespace ft {
 	template < typename _T >
 	bool	operator< (const list< _T >& lhs, const list< _T >& rhs)
 	{
-		for (typename list< _T >::const_iterator lIter = lhs.begin(), rIter = rhs.begin(); lIter != lhs.end(); ++lIter, ++rIter)
-		{
-			if (*lIter != *rIter)
-				return (*lIter < *rIter);
-		}
-		if (lhs.size() < rhs.size())
-			return (true);
-		if (lhs.size() > rhs.size())
-			return (false);
-		return (false);
+		return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
+		// for (typename list< _T >::const_iterator lIter = lhs.begin(), rIter = rhs.begin(); lIter != lhs.end(); ++lIter, ++rIter)
+		// {
+		// 	if (*lIter != *rIter)
+		// 		return (*lIter < *rIter);
+		// }
+		// if (lhs.size() < rhs.size())
+		// 	return (true);
+		// if (lhs.size() > rhs.size())
+		// 	return (false);
+		// return (false);
 	}
 
 	template < typename _T >

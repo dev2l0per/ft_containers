@@ -63,6 +63,11 @@ namespace ft {
 	{
 		return (!(lhs < rhs));
 	}
+
+	template < typename _T1, typename _T2 >
+	ft::pair< _T1, _T2 >	make_pair (_T1 x, _T2 y) {
+		return (ft::pair< _T1, _T2 >(x, y));
+	}
 }
 
 #endif

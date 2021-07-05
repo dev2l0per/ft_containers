@@ -295,7 +295,7 @@ namespace ft {
 			}
 
 		public:
-			RBTree(const allocator_type& alloc = allocator_type()) : _alloc(alloc) {
+			explicit RBTree(const value_compare& comp) : _comp(comp) {
 				this->_nil = _createNode();
 				this->_nil->_color = _BLACK;
 				this->_nil->_leftChild = this->_nil->_rightChild = this->_nil;
@@ -307,25 +307,45 @@ namespace ft {
 				this->_nil->_color = _BLACK;
 				this->_nil->_leftChild = this->_nil->_rightChild = this->_nil;
 				this->_root = this->_nil;
+
+				this->copyTree(x, x._root);
 			}
 
 			virtual ~RBTree() {}
+
+			RBTree&	operator= (const RBTree& x) {
+				if (this == &x)
+					return (*this);
+				
+				this->clearTree(this->_root);
+				this->copyTree(x, x._root);
+			}
 
 			node_pointer	getRoot(void) const
 			{
 				return (this->_root);
 			}
 
-			void	insertNode(const value_type& val)
+			node_alloc	getAlloc(void) const
+			{
+				return (this->_alloc);
+			}
+
+			node_pointer	getNil(void) const
+			{
+				return (this->_nil);
+			}
+
+			ft::pair< node_pointer, bool >	insertNode(const value_type& val)
 			{
 				node_pointer checkExisted = this->findNode(val);
 
 				if (checkExisted != this->_nil)
-					return ;
+					return (ft::make_pair< node_pointer, bool >(checkExisted, false)) ;
 
 				node_pointer node = this->_createNode(val);
 
-				std::cout << val << "is Creating.." << std::endl;
+				// std::cout << val << "is Creating.." << std::endl;
 
 				if (this->_root == this->_nil)
 				{
@@ -334,7 +354,7 @@ namespace ft {
 					node->_rightChild = this->_nil;
 					node->_color = _BLACK;
 
-					return ;
+					return (ft::make_pair< node_pointer, bool >(this->_root, true));
 				}
 
 				this->_insertNodeHelper(this->_root, node);
@@ -344,17 +364,17 @@ namespace ft {
 				node->_rightChild = this->_nil;
 
 				this->_insertCase1(node);
+				return (ft::make_pair< node_pointer, bool >(node, true));
 			}
 
-			void	deleteNode(const value_type& val)
+			bool	deleteNode(const value_type& val)
 			{
 				if (this->_root == this->_nil)
-					return ;
+					return (false);
 				
 				node_pointer	delNode = this->findNode(val);
 				if (delNode == this->_nil)
-					return ;
-				std::cout << val << " is deleting.." << std::endl;
+					return (false);
 				node_pointer	originPos;
 				bool	tempColor;
 
@@ -385,13 +405,14 @@ namespace ft {
 					tempNode->_color = delNode->_color;
 					std::cout << this->_nil << std::endl;
 				}
-				std::cout << "Delete Node Complete" << std::endl;
-				this->show_tree(this->_root, "", true);
+				// std::cout << "Delete Node Complete" << std::endl;
+				// this->show_tree(this->_root, "", true);
 				if (tempColor == _BLACK)
 					this->_deleteFixUp(originPos);
 				this->_nil->_parent = NULL; // 3번째 if 분기에서 nil 노드를 픽스업을 하기 위한 기준을 저장하기 위한 임시 노드로써 사용을 했기 때문에 원래 의도 대로 nil의 부모는 다시 NULL로써 초기화 하여 원래의 nil 노드의 의도로 되돌리기.
-				this->show_tree(this->_root, "", true);
+				// this->show_tree(this->_root, "", true);
 				this->_deleteNode(delNode);
+				return (true);
 			}
 
 			node_pointer	findNode(const value_type& val) const
@@ -412,10 +433,30 @@ namespace ft {
 				return (this->_nil);
 			}
 
+			node_pointer	getFirstNode(void) const {
+				if (this->_root == this->_nil)
+					return (this->_nil);
+				node_pointer curNode = this->_root;
+				
+				for (; curNode->_leftChild != this->_nil; curNode = curNode->_leftChild)
+					;
+				return (curNode);
+			}
+
+			node_pointer	getLastNode(void) const {
+				if (this->_root == this->_nil)
+					return (this->_nil);
+				node_pointer curNode = this->_root;
+				
+				for (; curNode->_rightChild != this->_nil; curNode = curNode->_rightChild)
+					;
+				return (curNode);
+			}
+
 			node_pointer	getNextNode(const node_pointer node) const
 			{
 				if (node == this->_nil)
-					return (this->_nil);
+					return (this->getFirstNode());
 				
 				if (node->_rightChild != this->_nil) {
 					node_pointer	curNode = node->_rightChild;
@@ -436,10 +477,10 @@ namespace ft {
 			node_pointer	getPrevNode(const node_pointer node) const
 			{
 				if (node == this->_nil)
-					return (this->_nil);
+					return (this->getLastNode());
 				
 				if (node->_leftChild != this->_nil) {
-					node_pointer = curNode = node->_leftChild;
+					node_pointer curNode = node->_leftChild;
 					for (; curNode->_rightChild != this->_nil; curNode = curNode->_rightChild)
 						;
 					return (curNode);
@@ -454,118 +495,190 @@ namespace ft {
 				return (this->_nil);
 			}
 
-			void show_tree(RBNode* root, std::string indent, bool last)
+			void	copyTree(const RBTree& toTree, node_pointer node)
 			{
-				// print the tree structure on the screen
-				if (root == this->_root && this->_root != this->_nil && this->_root != NULL && this->_root->_parent == NULL)
-				{
-					std::cout << indent;
-					if (last)
-					{
-						// std::cout << "R----";
-						indent += "    ";
-					}
-					else
-					{
-						// std::cout << "L----";
-						indent += "|    ";
-					}
-
-					// std::string sColor = (root->_color == RED) ? "RED" : "BLACK";
-					std::cout << "NULL " << std::endl;;
-				}
-				if (root == this->_nil)
-				{
-					std::cout << indent;
-					if (last)
-					{
-						std::cout << "R----";
-						indent += "     ";
-					}
-					else
-					{
-						std::cout << "L----";
-						indent += "|    ";
-					}
-
-					// std::string sColor = (root->_color == RED) ? "RED" : "BLACK";
-					std::cout << "NIL" << std::endl;
-				}
-				if (root != this->_nil)
-				{
-					std::cout << indent;
-					if (last)
-					{
-						std::cout << "R----";
-						indent += "     ";
-					}
-					else
-					{
-						std::cout << "L----";
-						indent += "|    ";
-					}
-
-					std::string sColor = (root->_color == _RED) ? "RED" : "BLACK";
-					std::cout << root->_data << "(" << sColor << ")" << std::endl;
-					show_tree(root->_leftChild, indent, false);
-					show_tree(root->_rightChild, indent, true);
-				}
-			}
-
-			void printInorder(RBNode* root)
-			{
-				if (root == this->_nil)
+				if (node == toTree._nil)
 					return ;
-				this->printInorder(root->_leftChild);
-				this->vector.push_back(root->_data);
-				std::cout << root->_data << " ";
-				this->printInorder(root->_rightChild);
+				this->insertNode(node->_data);
+				this->copyTree(toTree, node->_leftChild);
+				this->copyTree(toTree, node->_rightChild);
 			}
 
-			void check_traversal()
+			void	clearTree(node_pointer node)
 			{
-				RBNode* curr = this->_root;
-				RBNode* prev = NULL;
-				while (1)
-				{
-					// std::cout << curr->_data << std::endl;
-					this->vector.push_back(curr->_data);
-					if (prev == curr->_rightChild)
-					{
-						prev = curr;
-						if (curr->_parent != NULL)
-							curr = curr->_parent;
-						else
-							return ;
-						continue ;
-					}
-					else if (prev == curr->_leftChild)
-					{
-						prev = curr;
-						if (curr->_rightChild == this->_nil)
-							curr = curr->_parent;
-						else
-							curr = curr->_rightChild;
-						continue ;
-					}
+				if (node == this->_nil)
+					return ;
+				this->clearTree(node->_leftChild);
+				this->clearTree(node->_rightChild);
 
-					if (curr->_leftChild != this->_nil)
-					{
-						prev = curr;
-						curr = curr->_leftChild;
-						continue ;	
-					}
-					if (curr->_rightChild != this->_nil)
-					{
-						prev = curr;
-						curr = curr->_rightChild;
-						continue ;
-					}
-					prev = curr;
-					curr = curr->_parent;
-					continue ;
+				if (node == this->_root)
+					this->_root = this->_nil;
+				else {
+					node_pointer	tempNode = node;
+					
+					if (node == node->_parent->_leftChild)
+						node->_parent->_leftChild = this->_nil;
+					else
+						node->_parent->_rightChild = this->_nil;
+					node = this->_nil;
+					this->_deleteNode(tempNode);
 				}
 			}
+
+			node_pointer	lowerBound(node_pointer node) {
+				if (node == this->_nil)
+					return (this->_nil);
+				
+				if (this->_comp(this->getMaxNode(this->_root)->_data, node->_data))
+					return (this->_nil);
+				for (node_pointer curNode = this->_root; ;) {
+					if (this->_comp(curNode->_data, node->data)) {
+						if (curNode->_rightChild == this->_nil)
+							return (this->getNextNode(curNode));
+						curNode = curNode->_rightChild;
+					}
+					else {
+						if (!this->_comp(node->_data, curNode->_data))
+							return (curNode);
+						if (curNode->_leftChild == this->_nil)
+							return (curNode);
+						curNode = curNode->_leftChild;
+					}
+				}
+			}
+
+			node_pointer	upperBound(node_pointer node) {
+				if (node == this->_nil)
+					return (this->_nil);
+				
+				if (this->_comp(this->getMaxNode(this->_root)->_data, node->_data))
+					return (this->_nil);
+				for (node_pointer curNode = this->_root; ;) {
+					if (this->_comp(curNode->_data, node->data)) {
+						if (curNode->_rightChild == this->_nil)
+							return (this->getNextNode(curNode));
+						curNode = curNode->_rightChild;
+					}
+					else {
+						if (curNode->_leftChild == this->_nil)
+							return (curNode);
+						curNode = curNode->_leftChild;
+					}
+				}
+			}
+
+			// void show_tree(RBNode* root, std::string indent, bool last)
+			// {
+			// 	// print the tree structure on the screen
+			// 	if (root == this->_root && this->_root != this->_nil && this->_root != NULL && this->_root->_parent == NULL)
+			// 	{
+			// 		std::cout << indent;
+			// 		if (last)
+			// 		{
+			// 			// std::cout << "R----";
+			// 			indent += "    ";
+			// 		}
+			// 		else
+			// 		{
+			// 			// std::cout << "L----";
+			// 			indent += "|    ";
+			// 		}
+
+			// 		// std::string sColor = (root->_color == RED) ? "RED" : "BLACK";
+			// 		std::cout << "NULL " << std::endl;;
+			// 	}
+			// 	if (root == this->_nil)
+			// 	{
+			// 		std::cout << indent;
+			// 		if (last)
+			// 		{
+			// 			std::cout << "R----";
+			// 			indent += "     ";
+			// 		}
+			// 		else
+			// 		{
+			// 			std::cout << "L----";
+			// 			indent += "|    ";
+			// 		}
+
+			// 		// std::string sColor = (root->_color == RED) ? "RED" : "BLACK";
+			// 		std::cout << "NIL" << std::endl;
+			// 	}
+			// 	if (root != this->_nil)
+			// 	{
+			// 		std::cout << indent;
+			// 		if (last)
+			// 		{
+			// 			std::cout << "R----";
+			// 			indent += "     ";
+			// 		}
+			// 		else
+			// 		{
+			// 			std::cout << "L----";
+			// 			indent += "|    ";
+			// 		}
+
+			// 		std::string sColor = (root->_color == _RED) ? "RED" : "BLACK";
+			// 		std::cout << root->_data << "(" << sColor << ")" << std::endl;
+			// 		show_tree(root->_leftChild, indent, false);
+			// 		show_tree(root->_rightChild, indent, true);
+			// 	}
+			// }
+
+			// void printInorder(RBNode* root)
+			// {
+			// 	if (root == this->_nil)
+			// 		return ;
+			// 	this->printInorder(root->_leftChild);
+			// 	this->vector.push_back(root->_data);
+			// 	std::cout << root->_data << " ";
+			// 	this->printInorder(root->_rightChild);
+			// }
+
+			// void check_traversal()
+			// {
+			// 	RBNode* curr = this->_root;
+			// 	RBNode* prev = NULL;
+			// 	while (1)
+			// 	{
+			// 		// std::cout << curr->_data << std::endl;
+			// 		this->vector.push_back(curr->_data);
+			// 		if (prev == curr->_rightChild)
+			// 		{
+			// 			prev = curr;
+			// 			if (curr->_parent != NULL)
+			// 				curr = curr->_parent;
+			// 			else
+			// 				return ;
+			// 			continue ;
+			// 		}
+			// 		else if (prev == curr->_leftChild)
+			// 		{
+			// 			prev = curr;
+			// 			if (curr->_rightChild == this->_nil)
+			// 				curr = curr->_parent;
+			// 			else
+			// 				curr = curr->_rightChild;
+			// 			continue ;
+			// 		}
+
+			// 		if (curr->_leftChild != this->_nil)
+			// 		{
+			// 			prev = curr;
+			// 			curr = curr->_leftChild;
+			// 			continue ;	
+			// 		}
+			// 		if (curr->_rightChild != this->_nil)
+			// 		{
+			// 			prev = curr;
+			// 			curr = curr->_rightChild;
+			// 			continue ;
+			// 		}
+			// 		prev = curr;
+			// 		curr = curr->_parent;
+			// 		continue ;
+			// 	}
+			// }
 	};
 }
 

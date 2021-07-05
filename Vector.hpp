@@ -363,14 +363,13 @@ namespace ft {
 	{
 		if (lhs.size() != rhs.size())
 			return (false);
-		if (lhs.size() != rhs.size())
-			return (false);
-		for (typename vector< _T >::const_iterator lIter = lhs.begin(), rIter = rhs.begin(); lIter != lhs.end();)
-		{
-			if (*(lIter++) != *(rIter++))
-				return (false);
-		}
-		return (true);
+		return (ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
+		// for (typename vector< _T >::const_iterator lIter = lhs.begin(), rIter = rhs.begin(); lIter != lhs.end();)
+		// {
+		// 	if (*(lIter++) != *(rIter++))
+		// 		return (false);
+		// }
+		// return (true);
 	}
 
 	template < typename _T, typename _Alloc >
@@ -382,16 +381,17 @@ namespace ft {
 	template < typename _T, typename _Alloc >
 	bool	operator< (const vector< _T, _Alloc >& lhs, const vector< _T, _Alloc >& rhs)
 	{
-		for (typename vector< _T >::const_iterator lIter = lhs.begin(), rIter = rhs.begin(); lIter != lhs.end(); ++lIter, ++rIter)
-		{
-			if (*lIter != *rIter)
-				return (*lIter < *rIter);
-		}
-		if (lhs.size() < rhs.size())
-			return (true);
-		if (lhs.size() > rhs.size())
-			return (false);
-		return (false);
+		return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
+		// for (typename vector< _T >::const_iterator lIter = lhs.begin(), rIter = rhs.begin(); lIter != lhs.end(); ++lIter, ++rIter)
+		// {
+		// 	if (*lIter != *rIter)
+		// 		return (*lIter < *rIter);
+		// }
+		// if (lhs.size() < rhs.size())
+		// 	return (true);
+		// if (lhs.size() > rhs.size())
+		// 	return (false);
+		// return (false);
 	}
 
 	template < typename _T, typename _Alloc >

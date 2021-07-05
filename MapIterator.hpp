@@ -16,18 +16,20 @@ namespace ft {
 			typedef typename ft::typeSelector< value_type&, const value_type&, _isConst >::type	reference;
 			typedef typename ft::bidrectional_iterator_tag	iterator_category;
 
-			typedef const ft::RBTree< value_type, compare_type >	tree_type;
+			typedef const ft::RBTree< value_type, compare_type >*	tree_type;
 
-			typedef typename ft::typeSelector< typename ft::RBTree< value_type, compare_type>::node_type, const typename ft::RBTree< value_type, compare_type>::node_type, _isConst>::type	node_type;
-			typedef typename ft::typeSelector< typename ft::RBTree< value_type, compare_type>::node_pointer, const typename ft::RBTree< value_type, compare_type>::node_pointer, _isConst>::type node_pointer;
-			typedef typename ft::typeSelector< typename ft::RBTree< value_type, compare_type>::node_reference, const typename ft::RBTree< value_type, compare_type>::node_reference, _isConst>::type node_reference;
+			typedef typename ft::typeSelector< typename ft::RBTree< value_type, compare_type>::RBNode, const typename ft::RBTree< value_type, compare_type>::RBNode, _isConst>::type	node_type;
+			// typedef node_type*	node_pointer;
+			// typedef node_type&	node_reference;
+			typedef typename ft::typeSelector< typename ft::RBTree< value_type, compare_type>::RBNode*, const typename ft::RBTree< value_type, compare_type>::RBNode*, _isConst>::type node_pointer;
+			typedef typename ft::typeSelector< typename ft::RBTree< value_type, compare_type>::RBNode&, const typename ft::RBTree< value_type, compare_type>::RBNode&, _isConst>::type node_reference;
 
 		protected:
 			tree_type	_tree;
 			node_pointer	_ptr;
 
 		public:
-			MapIterator(node_pointer ptr = NULL, ft::RBTree< value_type, compare_type>* tree = NULL) : _tree(tre), _ptr(ptr) {}
+			MapIterator(node_pointer ptr = NULL, ft::RBTree< value_type, compare_type >* tree = NULL) : _tree(tree), _ptr(ptr) {}
 			// MapIterator(const MapIterator& rhs) : _ptr(rhs.getPtr()) {}
 			MapIterator(const MapIterator< value_type, compare_type, false >& rhs) : _tree(rhs.getTree()), _ptr(rhs.getPtr()) {}
 			virtual ~MapIterator() {}
