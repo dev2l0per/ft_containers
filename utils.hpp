@@ -115,7 +115,7 @@ namespace ft {
 	template < typename _InputIterator1, typename _InputIterator2 >
 	bool	equal (_InputIterator1 first1, _InputIterator1 last1, _InputIterator2 first2) {
 		while (first1 != last1) {
-			if (!(*first1 == last1))
+			if (!(*first1 == *first2))
 				return (false);
 			++first1;
 			++first2;

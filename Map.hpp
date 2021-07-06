@@ -53,6 +53,9 @@ namespace ft {
 			typedef typename tree_type::node_type	node_type;
 			typedef typename tree_type::node_reference	node_reference;
 			typedef typename tree_type::node_pointer	node_pointer;
+			typedef typename tree_type::const_node_type	const_node_type;
+			typedef typename tree_type::const_node_reference	const_node_reference;
+			typedef typename tree_type::const_node_pointer	const_node_pointer;
 
 		private:
 			tree_pointer	_tree;
@@ -94,12 +97,12 @@ namespace ft {
 					return (*this);
 
 				this->_size = x._size;
-				*this->_tree = *x.tree;
+				*(this->_tree) = *(x._tree);
 				return (*this);
 			}
 
 			mapped_type&	operator[] (const key_type& k) {
-				return (*((this->insert(ft::make_pair(k, mapped_type()))).first).second);
+				return ((*((this->insert(ft::make_pair(k, mapped_type()))).first)).second);
 			}
 
 			iterator	begin(void) {
@@ -119,11 +122,19 @@ namespace ft {
 			}
 
 			reverse_iterator	rbegin(void) {
-				return (reverse_iterator(this->end(), this->_tree));
+				return (reverse_iterator(this->end()));
 			}
 
 			const_reverse_iterator	rbegin(void) const {
-				return (const_reverse_iterator(this->end(), this->_tree));
+				return (const_reverse_iterator(this->end()));
+			}
+
+			reverse_iterator	rend(void) {
+				return (reverse_iterator(this->begin()));
+			}
+
+			const_reverse_iterator	rend(void) const {
+				return (const_reverse_iterator(this->begin()));
 			}
 
 			bool	empty(void) const {
@@ -160,19 +171,26 @@ namespace ft {
 			}
 
 			void	erase(iterator position) {
-				if (this->_tree->deleteNode(position->getPtr()->_data) == true)
+				if (this->_tree->deleteNode(position.getPtr()->_data) == true)
 					--this->_size;
 			}
 
-			size_type	erase(const key_type* k) {
+			size_type	erase(const key_type& k) {
 				if (this->_tree->deleteNode(ft::make_pair(k, mapped_type())) == true)
+				{
 					--this->_size;
-				return (1);
+					return (1);
+				}
+				return (0);
 			}
 
 			void	erase(iterator first, iterator last) {
-				for (iterator iter = first; iter != last; ++iter)
+				iterator iter;
+				for (; first != last;) {
+					iter = first;
+					++first;
 					this->erase(iter);
+				}
 			}
 
 			void	swap(map& x)
@@ -184,7 +202,7 @@ namespace ft {
 			}
 
 			void	clear(void) {
-				this->_tree->clearTree(this->_tree->_nil);
+				this->_tree->clearTree(this->_tree->getRoot());
 				this->_size = 0;
 			}
 
@@ -198,21 +216,21 @@ namespace ft {
 
 			iterator	find(const key_type& k) {
 				node_pointer	res = this->_tree->findNode(ft::make_pair(k, mapped_type()));
-				if (res == this->_tree->_nil)
+				if (res == this->_tree->getNil())
 					return (this->end());
 				return (iterator(res, this->_tree));
 			}
 
 			const_iterator	find(const key_type& k) const {
 				node_pointer	res = this->_tree->findNode(ft::make_pair(k, mapped_type()));
-				if (res == this->_tree->_nil)
+				if (res == this->_tree->getNil())
 					return (this->end());
 				return (const_iterator(res, this->_tree));
 			}
 
 			size_type	count (const key_type& k) const {
 				node_pointer	res = this->_tree->findNode(ft::make_pair(k, mapped_type()));
-				if (res == this->_tree->_nil)
+				if (res == this->_tree->getNil())
 					return (0);
 				return (1);
 			}
@@ -220,15 +238,15 @@ namespace ft {
 			iterator	upper_bound (const key_type& k) {
 				node_pointer	upperNode = this->_tree->upperBound(ft::make_pair(k, mapped_type()));
 
-				if (upperNode == this->_tree->_nil)
+				if (upperNode == this->_tree->getNil())
 					return (this->end());
 				return (iterator(upperNode, this->_tree));
 			}
 
 			const_iterator	upper_bound (const key_type& k) const {
-				node_pointer	upperNode = this->_tree->upperBound(ft::make_pair(k, mapped_type()));
+				const_node_pointer	upperNode = this->_tree->upperBound(ft::make_pair(k, mapped_type()));
 
-				if (upperNode == this->_tree->_nil)
+				if (upperNode == this->_tree->getNil())
 					return (this->end());
 				return (const_iterator(upperNode, this->_tree));
 			}
@@ -236,15 +254,15 @@ namespace ft {
 			iterator	lower_bound (const key_type& k) {
 				node_pointer	lowerNode = this->_tree->lowerBound(ft::make_pair(k, mapped_type()));
 				
-				if (lowerNode == this->_tree->_nil)
+				if (lowerNode == this->_tree->getNil())
 					return (this->end());
 				return (iterator(lowerNode, this->_tree));
 			}
 
 			const_iterator	lower_bound (const key_type& k) const {
-				node_pointer	lowerNode = this->_tree->lowerBound(ft::make_pair(k, mapped_type()));
+				const_node_pointer	lowerNode = this->_tree->lowerBound(ft::make_pair(k, mapped_type()));
 
-				if (lowerNode == this->_tree->_nil)
+				if (lowerNode == this->_tree->getNil())
 					return (this->end());
 				return (const_iterator(lowerNode, this->_tree));
 			}
@@ -282,7 +300,7 @@ namespace ft {
 	}
 	template < typename _Key, typename _T, typename _Compare, typename _Alloc >
 	bool	operator> (const map< _Key, _T, _Compare, _Alloc >& lhs, const map< _Key, _T, _Compare, _Alloc >& rhs) {
-		return (!(lhs < rhs));
+		return (rhs < lhs);
 	}
 	template < typename _Key, typename _T, typename _Compare, typename _Alloc >
 	bool	operator>= (const map< _Key, _T, _Compare, _Alloc >& lhs, const map< _Key, _T, _Compare, _Alloc >& rhs) {

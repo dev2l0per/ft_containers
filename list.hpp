@@ -498,12 +498,6 @@ namespace ft {
 		if (lhs.size() != rhs.size())
 			return (false);
 		return (ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
-		// for (typename list< _T >::const_iterator lIter = lhs.begin(), rIter = rhs.begin(); lIter != lhs.end();)
-		// {
-		// 	if (*(lIter++) != *(rIter++))
-		// 		return (false);
-		// }
-		// return (true);
 	}
 
 	template < typename _T >
@@ -516,16 +510,6 @@ namespace ft {
 	bool	operator< (const list< _T >& lhs, const list< _T >& rhs)
 	{
 		return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
-		// for (typename list< _T >::const_iterator lIter = lhs.begin(), rIter = rhs.begin(); lIter != lhs.end(); ++lIter, ++rIter)
-		// {
-		// 	if (*lIter != *rIter)
-		// 		return (*lIter < *rIter);
-		// }
-		// if (lhs.size() < rhs.size())
-		// 	return (true);
-		// if (lhs.size() > rhs.size())
-		// 	return (false);
-		// return (false);
 	}
 
 	template < typename _T >
