@@ -1,10 +1,10 @@
 #ifndef STACK_HPP
 # define STACK_HPP
 
-# include "list.hpp"
+# include "vector.hpp"
 
 namespace ft {
-	template < typename _T, typename _Container = ft::list< _T > >
+	template < typename _T, typename _Container = ft::vector< _T > >
 	class stack
 	{
 		public:
