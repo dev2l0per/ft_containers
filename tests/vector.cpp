@@ -4,7 +4,7 @@
 #include "../vector.hpp"
 
 #ifndef LEAK_TEST
-# define LEAK_TEST 1
+# define LEAK_TEST 0
 #endif
 
 #ifndef TEST_NS
@@ -17,7 +17,7 @@ template <typename T>
 void	printSize(TEST_NS::vector<T> const &vct, bool print_content = 1)
 {
 	std::cout << "size: " << vct.size() << std::endl;
-	//std::cout << "capacity: " << vct.capacity() << std::endl;
+	std::cout << "capacity: " << vct.capacity() << std::endl;
 	std::cout << "max_size: " << vct.max_size() << std::endl;
 	if (print_content)
 	{

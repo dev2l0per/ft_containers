@@ -6,7 +6,7 @@
 #include <list>
 
 #ifndef LEAK_TEST
-# define LEAK_TEST 1
+# define LEAK_TEST 0
 #endif
 
 #ifndef TEST_NS
@@ -40,7 +40,6 @@ std::string	printPair(const T &iterator, bool nl = true, std::ostream &o = std::
 void	printSize(TEST_NS::map<T1, T2> const &mp, bool print_content = 1)
 {
 	std::cout << "size: " << mp.size() << std::endl;
-	//std::cout << "max_size: " << mp.max_size() << std::endl;
 	if (print_content)
 	{
 		TEST_NS::map<T1, T2>::const_iterator it = mp.begin(), ite = mp.end();
@@ -254,10 +253,10 @@ TEST_TV			main()
 		itlow=map_lb1.lower_bound ('b');	// itlow points to b
 		std::cout << itlow->first << std::endl;
 
-		// if (itlow != map_lb1.end())
-		// 	std::cout << itlow->first << " | " << itlow->second << std::endl;
-		// else
-		// 	std::cout << "can not find" << std::endl;
+		if (itlow != map_lb1.end())
+			std::cout << itlow->first << " | " << itlow->second << std::endl;
+		else
+			std::cout << "can not find" << std::endl;
 		itup=map_lb1.upper_bound ('d');	 // itup points to e (not d!)
 
 		std::cout << itup->first << std::endl;
@@ -577,7 +576,7 @@ TEST_TV			main()
 
 		
 
-		std::cout << "==================== const iter test start ==============================" << std::endl;
+		std::cout << "==================== const iter test end ==============================" << std::endl;
 
 
 		std::cout << "==================== tricky erase iterator start ==============================" << std::endl;

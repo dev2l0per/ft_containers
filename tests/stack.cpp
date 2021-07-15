@@ -4,7 +4,7 @@
 #include <string>
 
 #ifndef LEAK_TEST
-# define LEAK_TEST 1
+# define LEAK_TEST 0
 #endif
 
 #ifndef TEST_NS

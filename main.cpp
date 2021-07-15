@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include <deque>
-#if 1 //CREATE A REAL STL EXAMPLE
+#if 0 //CREATE A REAL STL EXAMPLE
 	#include <map>
 	#include <stack>
 	#include <vector>
@@ -33,7 +33,7 @@ public:
 	MutantStack(const MutantStack<T>& src) { *this = src; }
 	MutantStack<T>& operator=(const MutantStack<T>& rhs) 
 	{
-		this->c = rhs.c;
+		this->_container = rhs._container;
 		return *this;
 	}
 	~MutantStack() {}
@@ -96,7 +96,7 @@ int main(int argc, char** argv) {
 	int sum = 0;
 	for (int i = 0; i < 10000; i++)
 	{
-		int access = rand();
+		int access = rand() % 10000;
 		sum += map_int[access];
 	}
 	std::cout << "should be constant with the same seed: " << sum << std::endl;

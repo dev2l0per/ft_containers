@@ -12,7 +12,7 @@ NC=\033[0m
 GREEN=\033[0;32m
 BLUE=\033[0;34m
 
-.PHONY : all my mli my_unit mli_unit v l m s q
+.PHONY : all my mli my_unit mli_unit v m s
 
 all :
 	@printf "\n\n$(BLUE) [*** START OWN TESTER ***] $(NC)\n\n"
@@ -21,29 +21,17 @@ all :
 	@make mli
 my :
 	@make my_unit
-	@make CONT=list my_unit
 	@make CONT=map my_unit
 	@make CONT=stack my_unit
-	@make CONT=queue my_unit
 
 mli :
 	@make mli_unit
-	@make CONT=list mli_unit
 	@make CONT=map mli_unit
 	@make CONT=stack mli_unit
-	@make CONT=queue mli_unit
 v :
 	@printf "\n\n$(BLUE) [*** START VECTOR TESTER ***] $(NC)\n\n"
 	@make my_unit
 	@make mli_unit
-l :
-	@printf "\n\n$(BLUE) [*** START LIST TESTER ***] $(NC)\n\n"
-	@make my_unit CONT=list
-	@make mli_unit CONT=list
-q :
-	@printf "\n\n$(BLUE) [*** START QUEUE TESTER ***] $(NC)\n\n"
-	@make my_unit CONT=queue
-	@make mli_unit CONT=queue
 s :
 	@printf "\n\n$(BLUE) [*** START STACK TESTER ***] $(NC)\n\n"
 	@make my_unit CONT=stack
@@ -54,7 +42,7 @@ m :
 	@make mli_unit CONT=map
 
 mli_unit :
-	@cd $(MLI_TESTER_DIR) && ./do.sh $(CONT)
+	@cd $(MLI_TESTER_DIR) && ./do.sh $(CONT) && cd ..
 
 my_unit :
 	@printf "***************************************************\n"
