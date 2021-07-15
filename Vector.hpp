@@ -38,8 +38,8 @@ namespace ft {
 				} else {
 					this->_capacity *= 2;
 					pointer	tempArr = this->_alloc.allocate(this->_capacity);
-					memcpy(tempArr, (void *)this->_arr, sizeof(value_type) * this->_size);
-					for (size_type i = 0; i < this->_size; ++i)
+					memcpy(reinterpret_cast<void *>(tempArr), reinterpret_cast<void *>(this->_arr), sizeof(value_type) * this->_size);
+					for (size_type i = 0; i < this->_capacity; ++i)
 						this->_alloc.destroy(this->_arr + i);
 					this->_alloc.deallocate(this->_arr, this->_size);
 					this->_arr = tempArr;
@@ -53,8 +53,8 @@ namespace ft {
 					this->_capacity = capacity;
 				} else {
 					pointer	tempArr = this->_alloc.allocate(capacity);
-					memmove(tempArr, reinterpret_cast<void *>(this->_arr), sizeof(value_type) * this->_size);
-					for (size_type i = 0; i < this->_size; ++i)
+					memmove(reinterpret_cast<void *>(tempArr), reinterpret_cast<void *>(this->_arr), sizeof(value_type) * this->_size);
+					for (size_type i = 0; i < this->_capacity; ++i)
 						this->_alloc.destroy(this->_arr + i);
 					this->_alloc.deallocate(this->_arr, this->_capacity);
 					this->_capacity = capacity;
@@ -285,7 +285,7 @@ namespace ft {
 					this->_expandCapacity(this->_size + n);
 				else if (this->_capacity < this->_size + n)
 					this->_expandCapacity();
-				memmove(reinterpret_cast<void *>(&this->_arr[pos + n]), reinterpret_cast<void *>(&this->_arr[pos]), sizeof(value_type) * (this->_size - pos + n));
+				memmove(reinterpret_cast<void *>(&this->_arr[pos + n]), reinterpret_cast<void *>(&this->_arr[pos]), sizeof(value_type) * (this->_size - pos));
 				for (size_type i = 0; i < n; ++i)
 					this->_arr[pos + i] = val;
 				this->_size += n;
@@ -304,7 +304,7 @@ namespace ft {
 					this->_expandCapacity(this->_size + n);
 				else if (this->_capacity < this->_size + n)
 					this->_expandCapacity();
-				memmove(&this->_arr[pos + n], &this->_arr[pos], sizeof(value_type) * (this->_size - pos + n));
+				memmove(reinterpret_cast<void *>(&this->_arr[pos + n]), reinterpret_cast<void *>(&this->_arr[pos]), sizeof(value_type) * (this->_size - pos));
 				n = 0;
 				for (_InputIterator iter = first; iter != last; iter++)
 					this->_arr[pos + n++] = *iter;

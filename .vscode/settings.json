@@ -68,6 +68,13 @@
 		"stack": "cpp",
 		"stdexcept": "cpp",
 		"streambuf": "cpp",
-		"typeinfo": "cpp"
+		"typeinfo": "cpp",
+		"*.tcc": "cpp",
+		"clocale": "cpp",
+		"compare": "cpp",
+		"concepts": "cpp",
+		"numeric": "cpp",
+		"random": "cpp",
+		"ranges": "cpp"
 	}
 }
